@@ -4,7 +4,7 @@
 
 **A production-style task manager API built secure-by-design, with security controls at every stage of the SDLC.**
 
-[![Security CI](https://kodekloud.com/kk-media/image/upload/v1752876750/notes-assets/images/GitHub-Actions-Adding-a-workflow-status-badge/github-status-badge-creation-popup.jpg)](https://github.com/Gav-debug8888/secure-task-api/actions/workflows/security-ci.yml)
+[![Security CI](https://github.com/Gav-debug8888/secure-task-api/actions/workflows/security-ci.yml/badge.svg)](https://github.com/Gav-debug8888/secure-task-api/actions/workflows/security-ci.yml)
 ![Python](https://img.shields.io/badge/Python-3.12-3776ab?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.162-009688?logo=fastapi&logoColor=white)
 ![Semgrep](https://img.shields.io/badge/SAST-Semgrep-1f8a70)
