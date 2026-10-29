@@ -11,6 +11,8 @@
 ![Trivy](https://img.shields.io/badge/Container-Trivy-1904da)
 ![Tests](https://img.shields.io/badge/security%20tests-44%20passing-brightgreen)
 
+**🌐 Live demo:** [secure-task-api-1711.onrender.com/health](https://secure-task-api-1711.onrender.com/health)
+
 </div>
 
 ---
@@ -122,6 +124,45 @@ curl -b jar localhost:8000/api/tasks
 | `RATE_LIMIT_ENABLED` | | `true` | Turn rate limiting on or off |
 | `AUTH_RATE_LIMIT` / `TASK_RATE_LIMIT` | | `5/minute` / `100/minute` | slowapi syntax |
 | `RATE_LIMIT_STORAGE_URI` | | `memory://` | Use `redis://...` for multiple replicas |
+
+## Live deployment
+
+The API is deployed on Render's free tier at **https://secure-task-api-1711.onrender.com**. It runs from the hardened `python:3.12-alpine` image with `ENVIRONMENT=production`. Interactive docs (`/docs`) are switched off in production on purpose, so use the endpoints below.
+
+These controls were checked against the live deployment:
+
+| Check | Result |
+|-------|--------|
+| `GET /health` | `200 {"status":"ok"}` |
+| Security headers | CSP `default-src 'none'`, HSTS (2 years, preload), `nosniff`, `X-Frame-Options: DENY` |
+| Server banner | No uvicorn version leaked |
+| Spoofed `Host: evil.com` | `403` (TrustedHost allow-list) |
+| `/docs` in production | `404` (disabled) |
+| Register a user | `201 Created` |
+| 6 bad logins within a minute | `401` ×5, then `429 Too Many Requests` |
+
+Try it yourself:
+
+```bash
+# Health check
+curl https://secure-task-api-1711.onrender.com/health
+
+# Inspect the security headers
+curl -I https://secure-task-api-1711.onrender.com/health
+
+# Host-header allow-list (expect 403)
+curl -i -H "Host: evil.com" https://secure-task-api-1711.onrender.com/health
+
+# Brute-force protection (the 6th attempt returns 429)
+for i in 1 2 3 4 5 6; do
+  curl -s -o /dev/null -w "%{http_code}\n" -X POST \
+    https://secure-task-api-1711.onrender.com/api/auth/login \
+    -H "Content-Type: application/json" \
+    -d '{"username":"nobody","password":"wrong-password"}'
+done
+```
+
+> **Free-tier notes:** the service sleeps after about 15 minutes idle, so the first request can take around 50 seconds. The SQLite database has no persistent disk, so its data resets whenever the service restarts.
 
 ## API endpoints
 
