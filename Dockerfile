@@ -2,7 +2,7 @@
 # Alpine: musl libc, no Debian packages, minimal CVE surface.
 # All dependencies (bcrypt, uvloop, httptools) ship prebuilt musllinux wheels,
 # so no compiler is needed in the builder or the runtime.
-FROM python:3.12-alpine AS builder
+FROM python:3.15-alpine AS builder
 ENV PIP_NO_CACHE_DIR=1 PIP_DISABLE_PIP_VERSION_CHECK=1
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
@@ -11,7 +11,7 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt && python -m pip uninstall -y pip
 
 # ---- Runtime stage: minimal Alpine, non-root ----
-FROM python:3.12-alpine
+FROM python:3.15-alpine
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PATH="/opt/venv/bin:$PATH" \
